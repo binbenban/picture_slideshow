@@ -1,8 +1,5 @@
-conf/*
-
+conf/parameters_secure.yml
 .vscode/*
-
-!data/downloaded_images
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
