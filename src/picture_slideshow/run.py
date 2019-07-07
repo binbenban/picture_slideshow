@@ -96,5 +96,7 @@ if __name__ == '__main__':
     # print(x)
     r = pcloud().downloadfile(
         url='2008-12-31 18.58.45.jpg', 
-        folderid=params['pic_root_folderid'])
+        folderid=params['pic_root_folderid'],
+        links
+    )
     print(r)
