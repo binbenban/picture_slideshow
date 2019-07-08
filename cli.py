@@ -6,8 +6,6 @@ import fire
 from picture_slideshow.run import main
 
 
-CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
-
 # get our package onto the python path
 PROJ_PATH = Path(__file__).resolve().parent
 sys.path.append(str(PROJ_PATH / "src"))
