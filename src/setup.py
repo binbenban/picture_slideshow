@@ -12,7 +12,9 @@ setup(
     name="picture_slideshow",
     version="0.1",
     packages=find_packages(exclude=["tests"]),
-    entry_points={"console_scripts": [entry_point]},
     install_requires=requires,
     extras_require={},
+    entry_points={
+        'console_scripts': ['picshow = cli:entry_point']
+    }
 )

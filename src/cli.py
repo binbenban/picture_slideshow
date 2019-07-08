@@ -2,7 +2,8 @@ import subprocess
 import sys
 from pathlib import Path
 import os
-import click
+import fire
+from picture_slideshow.run import main
 
 
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
@@ -15,13 +16,18 @@ os.environ["PYTHONPATH"] = (
 )
 os.environ["IPYTHONDIR"] = str(PROJ_PATH / ".ipython")
 
-
-
-@click.command()
 def run():
-    from picture_slideshow.run import main
     main()
 
 
+def test():
+    from tests.test_connection import test_pcloud
+    test_pcloud()
+
+
+def entry_point():
+    fire.Fire()
+
 if __name__ == '__main__':
-    run()
+    entry_point()
+

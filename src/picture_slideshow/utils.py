@@ -21,6 +21,8 @@ def load_params() -> dict:
 
 def pcloud() -> PyCloud:
     global pc
+
+    load_params()
     if pc is None:
         pc = PyCloud(
             params['pcloud']['user'],
