@@ -1,17 +1,17 @@
 import os
 import logging
 import zipfile
-import tempfile
 from pcloud import PyCloud
 from picture_slideshow.utils import load_params, pcloud, locate_image_in_folder, delete_files_in_folder
+from picture_slideshow.my_pcloud import RemoteFile
 from datetime import datetime
 from typing import List
-from picture_slideshow.my_pcloud import RemoteFile
+
 
 log = logging.getLogger(__name__)
 params = load_params()
 dl_path = params['download_folder']
-dl_zip_filepath = f"{params['download_folder']}/dl.zip"
+dl_zip_filepath = f"{dl_path}/dl.zip"
 
 
 def main():
