@@ -1,28 +1,58 @@
-from pcloud import PyCloud
 import os
-from picture_slideshow.utils import load_params, pcloud
+import logging
+import zipfile
+import tempfile
+from pcloud import PyCloud
+from picture_slideshow.utils import load_params, pcloud, locate_image_in_folder, delete_files_in_folder
 from datetime import datetime
 from typing import List
+from picture_slideshow.my_pcloud import RemoteFile
 
-
+log = logging.getLogger(__name__)
 params = load_params()
+dl_path = params['download_folder']
+dl_zip_filepath = f"{params['download_folder']}/dl.zip"
+
 
 def main():
     """
     entry point
     store the next 200 pictures
     """
-    pass
+    remotefiles = get_next_batch()
+    log.warning(f"retrieved remote files, size {len(remotefiles)}")
+
+    delete_files_in_folder(dl_path)
+    download_batch_as_zip(remotefiles)
+    extract_zip()
+
+
+def download_batch_as_zip(remotefiles: List[RemoteFile]) -> None:
+    kwargs = {
+        'fileids': ','.join([str(x.fileid) for x in remotefiles]),
+    }
+    zip_stream = pcloud()._do_request('getzip', json=False, **kwargs)
+    with open(dl_zip_filepath, 'wb') as dl:
+        dl.write(zip_stream)
+
+
+def extract_zip() -> None:
+    zip_ref = zipfile.ZipFile(dl_zip_filepath, 'r')
+    zip_ref.extractall(params['download_folder'])
+    zip_ref.close()
+    os.remove(dl_zip_filepath)
 
 
 def get_next_batch():
     last_image = last_downloaded_image()
+    log.warning(f'last image is {last_image}')
     year = last_image.split('-')[0]
     month = last_image.split('-')[1]
 
     cur_folder_path = f"{year}/{year}{month}"
     cur_folder_content = retrieve_remote_folder(cur_folder_path)
-    cur_folder_position = cur_folder_content.index(last_image)
+    cur_folder_position = locate_image_in_folder(cur_folder_content, last_image)
+    log.warning(f"last image in its folder at position {cur_folder_position}")
     images_to_download = []
 
     while len(images_to_download) < params['batch_size']:
@@ -37,7 +67,7 @@ def get_next_batch():
     return images_to_download
 
 
-def next_folder(folder_path):
+def next_folder(folder_path: str):
     all_folders = build_all_possible_folders()
     index = all_folders.index(folder_path) + 1
     if index == len(all_folders):
@@ -51,7 +81,8 @@ def download_from_folder(folder_path: str, start: int, max: int):
 
 
 def last_downloaded_image() -> str:
-    files = list(os.listdir('data/downloaded_images'))
+    files = sorted([x for x in os.listdir(params['download_folder']) if '.jpg' in x or '.png' in x])
+    print(files)
     if files:
         return files[-1]
     else:
@@ -59,10 +90,11 @@ def last_downloaded_image() -> str:
         return params['default_first_image']
 
 
-def retrieve_remote_folder(folder_path='') -> List[str]:
+def retrieve_remote_folder(folder_path='') -> List[RemoteFile]:
     root = params['pic_root_folderid']   #  "/pCloud Sync/pictures"
     root_subfolders = pcloud().listfolder(folderid=root)['metadata']['contents']
-    result = []
+    files = []
+    remote_files = []
 
     try:
         if folder_path:
@@ -74,11 +106,12 @@ def retrieve_remote_folder(folder_path='') -> List[str]:
             # go thru this subfolder again to find month
             year_subfolders = pcloud().listfolder(folderid=folderid_of_year)['metadata']['contents']
             folderid_of_month = [afolder['folderid'] for afolder in year_subfolders if afolder['name']==month][0]
-            result = pcloud().listfolder(folderid=folderid_of_month)['metadata']['contents']
+            files = pcloud().listfolder(folderid=folderid_of_month)['metadata']['contents']
     except Exception as e:
-        print(e)
-    print(result)
-    return sorted([x['name'] for x in result if 'image' in x['contenttype']])
+        log.error(e)
+    
+    remote_files = [RemoteFile(x['fileid'], x['name']) for x in files if 'image' in x['contenttype']]
+    return sorted(remote_files, key=lambda rf: rf.filename)
 
 
 def build_all_possible_folders() -> List[str]:
@@ -92,12 +125,4 @@ def build_all_possible_folders() -> List[str]:
 
 
 if __name__ == '__main__':
-    # x = get_next_batch()
-    # print(x)
-    print(params)
-    r = pcloud().downloadfile(
-        url='2008-12-31 18.58.45.jpg', 
-        folderid=params['pic_root_folderid'],
-        links=''
-    )
-    print(r)
+    main()

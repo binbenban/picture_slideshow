@@ -3,6 +3,8 @@
 # default_first_image: '2002-12-06 01.52.10.jpg'
 default_first_image: '2008-12-31 18.58.45.jpg'
 
-batch_size: 200
+batch_size: 20
 
 pic_root_folderid: 2415499913
+
+download_folder: data/downloaded_images
