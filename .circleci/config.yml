@@ -24,3 +24,11 @@ jobs:
       - restore_cache: # Restores the cached dependency.
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}       
 
+workflows:
+  version: 2
+  one_and_two:
+    jobs:
+      - build1
+      - build2:
+          requires:
+            - build1
