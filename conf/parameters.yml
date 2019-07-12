@@ -2,8 +2,10 @@
 #   user: 
 #   password: 
 
-# default_first_image: '2002-12-06 01.52.10.jpg'
-default_first_image: '2008-12-31 18.58.45.jpg'
+# a trick to view any month is 
+# - delete data/downloaded_images/*
+# - change below to yyyy-mm-xx xx.xx.xx.jpg with yyyy and mm of interest
+default_first_image: '2014-11-31 18.58.45.jpg'
 
 batch_size: 200
 

@@ -59,7 +59,7 @@ def get_next_batch():
     cur_folder_path = f"{year}/{year}{month}"
     cur_folder_content = retrieve_remote_folder(cur_folder_path)
     cur_folder_position = locate_image_in_folder(cur_folder_content, last_image)
-    log.warning(f"last image in its folder at position {cur_folder_position}")
+    log.warning(f"last image in its folder {cur_folder_path} at position {cur_folder_position}")
     images_to_download = []
 
     while len(images_to_download) < params['batch_size']:
