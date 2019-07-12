@@ -6,6 +6,7 @@ from picture_slideshow.utils import load_params, pcloud, locate_image_in_folder,
 from picture_slideshow.my_pcloud import RemoteFile
 from datetime import datetime
 from typing import List
+import math
 
 
 log = logging.getLogger(__name__)
@@ -23,8 +24,14 @@ def main():
     log.warning(f"retrieved remote files, size {len(remotefiles)}")
 
     delete_files_in_folder(dl_path)
-    download_batch_as_zip(remotefiles)
-    extract_zip()
+
+
+    batch_size = 20
+    num_of_batches = math.ceil(len(remotefiles) / batch_size)
+    for i in range(num_of_batches):
+        log.warning(f"processing {i+1} of {num_of_batches} batches")
+        download_batch_as_zip(remotefiles[i*batch_size:(i+1)*batch_size])
+        extract_zip()
 
 
 def download_batch_as_zip(remotefiles: List[RemoteFile]) -> None:
