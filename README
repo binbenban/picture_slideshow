@@ -1,0 +1,4 @@
+	python3.6 -m venv venv
+	. venv/bin/activate
+	pip install -e .
+	# pre-commit install
