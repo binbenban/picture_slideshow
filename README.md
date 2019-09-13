@@ -12,5 +12,3 @@ pre-commit install
 `crontab -e`
 
 add cron job
-
-

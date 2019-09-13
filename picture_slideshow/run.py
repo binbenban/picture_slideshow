@@ -56,27 +56,34 @@ def get_next_batch():
     images_to_download = []
 
     while len(images_to_download) < params['batch_size']:
+        print(f"in the loop again... so far got images {images_to_download}")
         images_to_download += download_from_folder(
-            cur_folder_path, 
-            cur_folder_position, 
+            cur_folder_path,
+            cur_folder_position,
             params['batch_size']-len(images_to_download)
         )
+        print(f"... after getting from folder {cur_folder_path}, we have images: {images_to_download}")
         cur_folder_path = next_folder(cur_folder_path)
         cur_folder_position = 0
-    
+
     return images_to_download
 
 
 def next_folder(folder_path: str):
+    print(f"...trying to get next folder of {folder_path}")
     all_folders = build_all_possible_folders()
     index = all_folders.index(folder_path) + 1
     if index == len(all_folders):
         index = 0
-    return all_folders[index]
+    result = all_folders[index]
+    print("...next folder returned is {}".format(result))
+    return result
 
 
 def download_from_folder(folder_path: str, start: int, max: int):
+    print(f"...checkin folder {folder_path}")
     folder_list = retrieve_remote_folder(folder_path)
+    print(f"...done checkin folder {folder_path}")
     return folder_list[start:start+max]
 
 
@@ -102,14 +109,14 @@ def retrieve_remote_folder(folder_path='') -> List[RemoteFile]:
             month = folder_path.split('/')[1]
             # go thru result to find folder with name = year
             folderid_of_year = [afolder['folderid'] for afolder in root_subfolders if afolder['name']==year][0]
-            
+
             # go thru this subfolder again to find month
             year_subfolders = pcloud().listfolder(folderid=folderid_of_year)['metadata']['contents']
             folderid_of_month = [afolder['folderid'] for afolder in year_subfolders if afolder['name']==month][0]
             files = pcloud().listfolder(folderid=folderid_of_month)['metadata']['contents']
     except Exception as e:
         log.error(e)
-    
+
     remote_files = [RemoteFile(x['fileid'], x['name']) for x in files if 'image' in x['contenttype']]
     return sorted(remote_files, key=lambda rf: rf.filename)
 
