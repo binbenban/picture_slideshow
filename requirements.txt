@@ -1,4 +1,7 @@
 pcloud
 fire
 PyYAML
+<<<<<<< HEAD
 pre-commit
+=======
+>>>>>>> b1da4411027de647d6662b83fbbb772d9f6b27cf
