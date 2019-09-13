@@ -56,13 +56,11 @@ def get_next_batch():
     images_to_download = []
 
     while len(images_to_download) < params['batch_size']:
-        print(f"in the loop again... so far got images {images_to_download}")
         images_to_download += download_from_folder(
             cur_folder_path,
             cur_folder_position,
             params['batch_size']-len(images_to_download)
         )
-        print(f"... after getting from folder {cur_folder_path}, we have images: {images_to_download}")
         cur_folder_path = next_folder(cur_folder_path)
         cur_folder_position = 0
 
@@ -70,26 +68,21 @@ def get_next_batch():
 
 
 def next_folder(folder_path: str):
-    print(f"...trying to get next folder of {folder_path}")
     all_folders = build_all_possible_folders()
     index = all_folders.index(folder_path) + 1
     if index == len(all_folders):
         index = 0
     result = all_folders[index]
-    print("...next folder returned is {}".format(result))
     return result
 
 
 def download_from_folder(folder_path: str, start: int, max: int):
-    print(f"...checkin folder {folder_path}")
     folder_list = retrieve_remote_folder(folder_path)
-    print(f"...done checkin folder {folder_path}")
     return folder_list[start:start+max]
 
 
 def last_downloaded_image() -> str:
     files = sorted([x for x in os.listdir(params['download_folder']) if '.jpg' in x or '.png' in x])
-    print(files)
     if files:
         return files[-1]
     else:
